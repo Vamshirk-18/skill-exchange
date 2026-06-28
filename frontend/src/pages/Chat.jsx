@@ -4,7 +4,7 @@ import { io } from 'socket.io-client';
 import API from '../api/axios';
 import { useAuth } from '../context/AuthContext';
 
-const socket = io('http://localhost:5000');
+const socket = io('https://skillswap-backend-379k.onrender.com');
 
 const Chat = () => {
   const { swapId } = useParams();
