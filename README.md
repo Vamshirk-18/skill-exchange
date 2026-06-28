@@ -49,7 +49,7 @@ JWT_SECRET=your_jwt_secret
 ```
 
 ## 📸 Screenshots
-_Add screenshots here after deployment_
+[skill-exchange-jet-zeta.vercel.app](https://skill-exchange-jet-zeta.vercel.app)
 
 ## 👨‍💻 Author
 Vamshi — CSE (AI & ML) @ Sahyadri College of Engineering, Mangaluru
