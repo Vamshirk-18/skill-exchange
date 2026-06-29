@@ -1,104 +1,127 @@
-import { useState } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { io } from 'socket.io-client';
+import API from '../api/axios';
 import { useAuth } from '../context/AuthContext';
-import toast from 'react-hot-toast';
 
-const Navbar = () => {
-  const { user, logout } = useAuth();
+const socket = io('https://skillswap-backend-379k.onrender.com', {
+  transports: ['websocket', 'polling'],
+  secure: true,
+});
+
+const Chat = () => {
+  const { swapId } = useParams();
+  const { user } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const [text, setText] = useState('');
+  const [swapInfo, setSwapInfo] = useState(null);
+  const bottomRef = useRef(null);
 
-  const handleLogout = () => {
-    logout();
-    toast.success('Logged out!');
-    navigate('/');
-    setMenuOpen(false);
+  useEffect(() => {
+    socket.emit('join_room', swapId);
+
+    API.get(`/messages/${swapId}`)
+      .then(({ data }) => setMessages(data))
+      .catch(() => navigate('/dashboard'));
+
+    API.get('/swap/received').then(({ data }) => {
+      const swap = data.find(s => s._id === swapId);
+      if (swap) setSwapInfo({ name: swap.sender?.name, skill: swap.senderSkill });
+    });
+    API.get('/swap/sent').then(({ data }) => {
+      const swap = data.find(s => s._id === swapId);
+      if (swap) setSwapInfo({ name: swap.receiver?.name, skill: swap.receiverSkill });
+    });
+
+    socket.on('receive_message', (message) => {
+      setMessages(prev => [...prev, message]);
+    });
+
+    return () => { socket.off('receive_message'); };
+  }, [swapId]);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  const sendMessage = () => {
+    if (!text.trim()) return;
+    socket.emit('send_message', {
+      swapId,
+      senderId: user._id,
+      text: text.trim(),
+    });
+    setText('');
   };
 
-  const isActive = (path) => location.pathname === path
-    ? 'text-white font-semibold border-b-2 border-white pb-1'
-    : 'text-indigo-200 hover:text-white transition';
+  const handleKey = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  };
 
   return (
-    <nav className="bg-indigo-600 text-white px-4 py-3 shadow-lg">
-      <div className="max-w-6xl mx-auto flex justify-between items-center">
-        <Link to={user ? '/browse' : '/'} className="text-xl font-bold flex items-center gap-2">
-          🔄 <span>SkillSwap</span>
-        </Link>
-
-        {/* Desktop menu */}
-        <div className="hidden md:flex gap-6 items-center">
-          {user ? (
-            <>
-              <Link to="/browse" className={isActive('/browse')}>Browse</Link>
-              <Link to="/dashboard" className={isActive('/dashboard')}>Dashboard</Link>
-              <Link to="/profile" className={isActive('/profile')}>Profile</Link>
-              <div className="flex items-center gap-2 ml-2">
-                <div className="w-8 h-8 bg-white text-indigo-600 rounded-full flex items-center justify-center font-bold text-sm">
-                  {user.name?.[0]?.toUpperCase()}
-                </div>
-                <button onClick={handleLogout}
-                  className="bg-white text-indigo-600 px-3 py-1 rounded-lg font-semibold hover:bg-indigo-50 text-sm transition">
-                  Logout
-                </button>
-              </div>
-            </>
-          ) : (
-            <>
-              <Link to="/login" className={isActive('/login')}>Login</Link>
-              <Link to="/register"
-                className="bg-white text-indigo-600 px-4 py-2 rounded-lg font-semibold hover:bg-indigo-50 transition text-sm">
-                Get Started
-              </Link>
-            </>
-          )}
+    <div className="flex flex-col h-[calc(100vh-60px)] max-w-3xl mx-auto">
+      {/* Header */}
+      <div className="bg-white border-b border-gray-100 p-3 flex items-center gap-3 shadow-sm">
+        <button onClick={() => navigate('/dashboard')}
+          className="text-gray-400 hover:text-gray-600 transition text-xl p-1">←</button>
+        <div className="w-9 h-9 bg-gradient-to-br from-indigo-400 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
+          {swapInfo?.name?.[0]?.toUpperCase() || '?'}
         </div>
-
-        {/* Mobile hamburger */}
-        <button className="md:hidden text-white text-2xl" onClick={() => setMenuOpen(!menuOpen)}>
-          {menuOpen ? '✕' : '☰'}
-        </button>
+        <div>
+          <h2 className="font-bold text-gray-800 text-sm">{swapInfo?.name || 'Chat'}</h2>
+          <p className="text-xs text-gray-500">Skill Swap Partner 🤝</p>
+        </div>
       </div>
 
-      {/* Mobile menu */}
-      {menuOpen && (
-        <div className="md:hidden mt-3 border-t border-indigo-500 pt-3 flex flex-col gap-2 px-2">
-          {user ? (
-            <>
-              <Link to="/browse" onClick={() => setMenuOpen(false)}
-                className="text-indigo-100 hover:text-white py-2 px-3 rounded-lg hover:bg-indigo-500 transition">
-                🔍 Browse
-              </Link>
-              <Link to="/dashboard" onClick={() => setMenuOpen(false)}
-                className="text-indigo-100 hover:text-white py-2 px-3 rounded-lg hover:bg-indigo-500 transition">
-                📊 Dashboard
-              </Link>
-              <Link to="/profile" onClick={() => setMenuOpen(false)}
-                className="text-indigo-100 hover:text-white py-2 px-3 rounded-lg hover:bg-indigo-500 transition">
-                👤 Profile
-              </Link>
-              <button onClick={handleLogout}
-                className="text-left text-red-300 hover:text-white py-2 px-3 rounded-lg hover:bg-indigo-500 transition">
-                🚪 Logout
-              </button>
-            </>
-          ) : (
-            <>
-              <Link to="/login" onClick={() => setMenuOpen(false)}
-                className="text-indigo-100 hover:text-white py-2 px-3 rounded-lg hover:bg-indigo-500 transition">
-                Login
-              </Link>
-              <Link to="/register" onClick={() => setMenuOpen(false)}
-                className="bg-white text-indigo-600 py-2 px-3 rounded-lg font-semibold text-center">
-                Get Started 🚀
-              </Link>
-            </>
-          )}
-        </div>
-      )}
-    </nav>
+      {/* Messages */}
+      <div className="flex-1 overflow-y-auto p-4 bg-gray-50 space-y-3">
+        {messages.length === 0 && (
+          <div className="text-center py-20">
+            <div className="text-5xl mb-4">💬</div>
+            <p className="text-gray-500 text-sm">No messages yet. Say hello!</p>
+          </div>
+        )}
+        {messages.map((msg, i) => {
+          const isMe = msg.sender._id === user._id || msg.sender === user._id;
+          return (
+            <div key={i} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
+              <div className={`max-w-[75%] px-4 py-2.5 rounded-2xl ${
+                isMe
+                  ? 'bg-indigo-600 text-white rounded-br-sm'
+                  : 'bg-white text-gray-800 rounded-bl-sm shadow-sm border border-gray-100'
+              }`}>
+                {!isMe && <p className="text-xs font-semibold text-indigo-600 mb-1">{msg.sender.name}</p>}
+                <p className="text-sm">{msg.text}</p>
+                <p className={`text-xs mt-1 ${isMe ? 'text-indigo-200' : 'text-gray-400'}`}>
+                  {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </p>
+              </div>
+            </div>
+          );
+        })}
+        <div ref={bottomRef} />
+      </div>
+
+      {/* Input */}
+      <div className="bg-white border-t border-gray-100 p-3 flex gap-2">
+        <input
+          className="flex-1 border border-gray-200 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400 text-sm"
+          placeholder="Type a message..."
+          value={text}
+          onChange={e => setText(e.target.value)}
+          onKeyDown={handleKey}
+        />
+        <button onClick={sendMessage}
+          className="bg-indigo-600 text-white px-4 py-3 rounded-xl hover:bg-indigo-700 transition font-semibold text-sm">
+          🚀
+        </button>
+      </div>
+    </div>
   );
 };
 
-export default Navbar;
+export default Chat;
