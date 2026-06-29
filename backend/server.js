@@ -29,7 +29,7 @@ app.use('/api/profile', require('./routes/profileRoutes'));
 app.use('/api/swap', require('./routes/swapRoutes'));
 app.use('/api/rating', require('./routes/ratingRoutes'));
 app.use('/api/messages', require('./routes/messageRoutes'));
-
+app.use('/api/session', require('./routes/sessionRoutes'));
 app.get('/', (req, res) => res.send('Skill Exchange API Running'));
 
 // Socket.io
