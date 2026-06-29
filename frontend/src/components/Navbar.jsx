@@ -34,6 +34,7 @@ const Navbar = () => {
             <>
               <Link to="/browse" className={isActive('/browse')}>Browse</Link>
               <Link to="/dashboard" className={isActive('/dashboard')}>Dashboard</Link>
+              <Link to="/sessions" className={isActive('/sessions')}>Sessions</Link>
               <Link to="/profile" className={isActive('/profile')}>Profile</Link>
               <div className="flex items-center gap-2">
                 <div className="w-9 h-9 bg-white text-indigo-600 rounded-full flex items-center justify-center font-bold text-sm">
@@ -75,6 +76,10 @@ const Navbar = () => {
                 className="text-indigo-100 hover:text-white py-3 px-3 rounded-lg hover:bg-indigo-500 transition">
                 📊 Dashboard
               </Link>
+              <Link to="/sessions" onClick={() => setMenuOpen(false)}
+  className="text-indigo-100 hover:text-white py-3 px-3 rounded-lg hover:bg-indigo-500 transition">
+  📅 Sessions
+</Link>
               <Link to="/profile" onClick={() => setMenuOpen(false)}
                 className="text-indigo-100 hover:text-white py-3 px-3 rounded-lg hover:bg-indigo-500 transition">
                 👤 Profile
