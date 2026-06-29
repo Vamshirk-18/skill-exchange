@@ -22,75 +22,76 @@ const Navbar = () => {
 
   return (
     <nav className="bg-indigo-600 text-white shadow-lg">
-      <div className="max-w-6xl mx-auto px-8 py-5 flex justify-between items-center">
-        <Link to={user ? '/browse' : '/'} className="text-2xl font-bold flex items-center gap-2">
+      <div className="px-6 py-4 flex justify-between items-center">
+        {/* Logo - left side */}
+        <Link to={user ? '/browse' : '/'} className="text-xl font-bold flex items-center gap-2">
           🔄 <span>SkillSwap</span>
         </Link>
 
-        {/* Desktop menu — only on md and above */}
-        <div className="hidden md:flex gap-8 items-center">
+        {/* Desktop menu - pushed to far right */}
+        <div className="hidden md:flex gap-6 items-center ml-auto">
           {user ? (
             <>
-              <Link to="/browse" className={`text-base ${isActive('/browse')}`}>Browse</Link>
-              <Link to="/dashboard" className={`text-base ${isActive('/dashboard')}`}>Dashboard</Link>
-              <Link to="/profile" className={`text-base ${isActive('/profile')}`}>Profile</Link>
-              <div className="flex items-center gap-3 ml-2">
-                <div className="w-10 h-10 bg-white text-indigo-600 rounded-full flex items-center justify-center font-bold text-base">
+              <Link to="/browse" className={isActive('/browse')}>Browse</Link>
+              <Link to="/dashboard" className={isActive('/dashboard')}>Dashboard</Link>
+              <Link to="/profile" className={isActive('/profile')}>Profile</Link>
+              <div className="flex items-center gap-2">
+                <div className="w-9 h-9 bg-white text-indigo-600 rounded-full flex items-center justify-center font-bold text-sm">
                   {user.name?.[0]?.toUpperCase()}
                 </div>
                 <button onClick={handleLogout}
-                  className="bg-white text-indigo-600 px-4 py-2 rounded-lg font-semibold hover:bg-indigo-50 text-base transition">
+                  className="bg-white text-indigo-600 px-4 py-2 rounded-lg font-semibold hover:bg-indigo-50 text-sm transition">
                   Logout
                 </button>
               </div>
             </>
           ) : (
             <>
-              <Link to="/login" className={`text-base ${isActive('/login')}`}>Login</Link>
+              <Link to="/login" className={isActive('/login')}>Login</Link>
               <Link to="/register"
-                className="bg-white text-indigo-600 px-5 py-2 rounded-lg font-semibold hover:bg-indigo-50 transition text-base">
+                className="bg-white text-indigo-600 px-4 py-2 rounded-lg font-semibold hover:bg-indigo-50 transition text-sm">
                 Get Started
               </Link>
             </>
           )}
         </div>
 
-        {/* Mobile hamburger — only on small screens */}
-        <button className="md:hidden text-white text-3xl" onClick={() => setMenuOpen(!menuOpen)}>
+        {/* Mobile hamburger - far right on mobile */}
+        <button className="md:hidden text-white text-2xl ml-auto" onClick={() => setMenuOpen(!menuOpen)}>
           {menuOpen ? '✕' : '☰'}
         </button>
       </div>
 
-      {/* Mobile dropdown — only shows on small screens when menu open */}
+      {/* Mobile dropdown */}
       {menuOpen && (
         <div className="md:hidden border-t border-indigo-500 px-4 py-3 flex flex-col gap-2">
           {user ? (
             <>
               <Link to="/browse" onClick={() => setMenuOpen(false)}
-                className="text-indigo-100 hover:text-white py-3 px-3 rounded-lg hover:bg-indigo-500 transition text-base">
+                className="text-indigo-100 hover:text-white py-3 px-3 rounded-lg hover:bg-indigo-500 transition">
                 🔍 Browse
               </Link>
               <Link to="/dashboard" onClick={() => setMenuOpen(false)}
-                className="text-indigo-100 hover:text-white py-3 px-3 rounded-lg hover:bg-indigo-500 transition text-base">
+                className="text-indigo-100 hover:text-white py-3 px-3 rounded-lg hover:bg-indigo-500 transition">
                 📊 Dashboard
               </Link>
               <Link to="/profile" onClick={() => setMenuOpen(false)}
-                className="text-indigo-100 hover:text-white py-3 px-3 rounded-lg hover:bg-indigo-500 transition text-base">
+                className="text-indigo-100 hover:text-white py-3 px-3 rounded-lg hover:bg-indigo-500 transition">
                 👤 Profile
               </Link>
               <button onClick={handleLogout}
-                className="text-left text-red-300 hover:text-white py-3 px-3 rounded-lg hover:bg-indigo-500 transition text-base">
+                className="text-left text-red-300 hover:text-white py-3 px-3 rounded-lg hover:bg-indigo-500 transition">
                 🚪 Logout
               </button>
             </>
           ) : (
             <>
               <Link to="/login" onClick={() => setMenuOpen(false)}
-                className="text-indigo-100 hover:text-white py-3 px-3 rounded-lg hover:bg-indigo-500 transition text-base">
+                className="text-indigo-100 hover:text-white py-3 px-3 rounded-lg hover:bg-indigo-500 transition">
                 Login
               </Link>
               <Link to="/register" onClick={() => setMenuOpen(false)}
-                className="bg-white text-indigo-600 py-3 px-3 rounded-lg font-semibold text-center text-base">
+                className="bg-white text-indigo-600 py-3 px-3 rounded-lg font-semibold text-center">
                 Get Started 🚀
               </Link>
             </>
