@@ -12,10 +12,15 @@ connectDB();
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
-  cors: { origin: 'http://localhost:5173', methods: ['GET', 'POST'] }
+  cors: {
+    origin: ['http://localhost:5173', 'https://skill-exchange-jet-zeta.vercel.app'],
+    methods: ['GET', 'POST']
+  }
 });
 
-app.use(cors());
+app.use(cors({
+  origin: ['http://localhost:5173', 'https://skill-exchange-jet-zeta.vercel.app'],
+}));
 app.use(express.json());
 
 // Routes
@@ -31,13 +36,11 @@ app.get('/', (req, res) => res.send('Skill Exchange API Running'));
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
 
-  // Join a swap room
   socket.on('join_room', (swapId) => {
     socket.join(swapId);
     console.log(`User joined room: ${swapId}`);
   });
 
-  // Send message
   socket.on('send_message', async (data) => {
     try {
       const message = await Message.create({
