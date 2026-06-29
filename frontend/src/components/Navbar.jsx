@@ -21,13 +21,13 @@ const Navbar = () => {
     : 'text-indigo-200 hover:text-white transition';
 
   return (
-    <nav className="bg-indigo-600 text-white px-4 py-3 shadow-lg">
-      <div className="max-w-6xl mx-auto flex justify-between items-center">
+    <nav className="bg-indigo-600 text-white shadow-lg">
+      <div className="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
         <Link to={user ? '/browse' : '/'} className="text-xl font-bold flex items-center gap-2">
           🔄 <span>SkillSwap</span>
         </Link>
 
-        {/* Desktop menu */}
+        {/* Desktop menu — shows on md and above */}
         <div className="hidden md:flex gap-6 items-center">
           {user ? (
             <>
@@ -35,11 +35,11 @@ const Navbar = () => {
               <Link to="/dashboard" className={isActive('/dashboard')}>Dashboard</Link>
               <Link to="/profile" className={isActive('/profile')}>Profile</Link>
               <div className="flex items-center gap-2 ml-2">
-                <div className="w-8 h-8 bg-white text-indigo-600 rounded-full flex items-center justify-center font-bold text-sm">
+                <div className="w-9 h-9 bg-white text-indigo-600 rounded-full flex items-center justify-center font-bold text-sm">
                   {user.name?.[0]?.toUpperCase()}
                 </div>
                 <button onClick={handleLogout}
-                  className="bg-white text-indigo-600 px-3 py-1 rounded-lg font-semibold hover:bg-indigo-50 text-sm transition">
+                  className="bg-white text-indigo-600 px-4 py-2 rounded-lg font-semibold hover:bg-indigo-50 text-sm transition">
                   Logout
                 </button>
               </div>
@@ -55,15 +55,15 @@ const Navbar = () => {
           )}
         </div>
 
-        {/* Mobile hamburger */}
+        {/* Mobile hamburger — shows below md */}
         <button className="md:hidden text-white text-2xl" onClick={() => setMenuOpen(!menuOpen)}>
           {menuOpen ? '✕' : '☰'}
         </button>
       </div>
 
-      {/* Mobile menu */}
+      {/* Mobile dropdown menu */}
       {menuOpen && (
-        <div className="md:hidden mt-3 border-t border-indigo-500 pt-3 flex flex-col gap-2 px-2">
+        <div className="md:hidden border-t border-indigo-500 px-4 py-3 flex flex-col gap-2">
           {user ? (
             <>
               <Link to="/browse" onClick={() => setMenuOpen(false)}
