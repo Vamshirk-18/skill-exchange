@@ -27,7 +27,7 @@ const Navbar = () => {
           🔄 <span>SkillSwap</span>
         </Link>
 
-        {/* Desktop menu — shows on md and above */}
+        {/* Desktop menu */}
         <div className="hidden md:flex gap-6 items-center">
           {user ? (
             <>
@@ -55,13 +55,13 @@ const Navbar = () => {
           )}
         </div>
 
-        {/* Mobile hamburger — shows below md */}
+        {/* Mobile hamburger */}
         <button className="md:hidden text-white text-2xl" onClick={() => setMenuOpen(!menuOpen)}>
           {menuOpen ? '✕' : '☰'}
         </button>
       </div>
 
-      {/* Mobile dropdown menu */}
+      {/* Mobile dropdown */}
       {menuOpen && (
         <div className="md:hidden border-t border-indigo-500 px-4 py-3 flex flex-col gap-2">
           {user ? (
