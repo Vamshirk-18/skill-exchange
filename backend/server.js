@@ -29,7 +29,8 @@ app.use('/api/profile', require('./routes/profileRoutes'));
 app.use('/api/swap', require('./routes/swapRoutes'));
 app.use('/api/rating', require('./routes/ratingRoutes'));
 app.use('/api/messages', require('./routes/messageRoutes'));
-app.use('/api/session', require('./routes/sessionRoutes'));
+app.use('/api/upload', require('./routes/uploadRoutes'));
+
 app.get('/', (req, res) => res.send('Skill Exchange API Running'));
 
 // Socket.io
@@ -46,7 +47,10 @@ io.on('connection', (socket) => {
       const message = await Message.create({
         swapRequest: data.swapId,
         sender: data.senderId,
-        text: data.text,
+        text: data.text || '',
+        fileUrl: data.fileUrl || undefined,
+        fileName: data.fileName || undefined,
+        fileType: data.fileType || undefined,
       });
       const populated = await message.populate('sender', 'name');
       io.to(data.swapId).emit('receive_message', populated);
