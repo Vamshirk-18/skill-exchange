@@ -6,7 +6,9 @@ const {
   getReceivedRequests,
   getSentRequests,
   respondToRequest,
-  cancelRequest
+  cancelRequest,
+  proposeSession,
+  confirmSession,
 } = require('../controllers/swapController');
 
 router.post('/send', protect, sendSwapRequest);
@@ -14,5 +16,7 @@ router.get('/received', protect, getReceivedRequests);
 router.get('/sent', protect, getSentRequests);
 router.put('/:id/respond', protect, respondToRequest);
 router.delete('/:id', protect, cancelRequest);
+router.put('/:id/propose-session', protect, proposeSession);
+router.put('/:id/confirm-session', protect, confirmSession);
 
 module.exports = router;
