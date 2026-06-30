@@ -145,7 +145,6 @@ const proposeSession = async (req, res) => {
 
 // @PUT /api/swap/:id/confirm-session
 const confirmSession = async (req, res) => {
-  const { meetLink } = req.body;
   try {
     const request = await SwapRequest.findById(req.params.id);
     if (!request) return res.status(404).json({ message: 'Request not found' });
@@ -164,7 +163,6 @@ const confirmSession = async (req, res) => {
     }
 
     request.session.confirmed = true;
-    request.session.meetLink = meetLink;
     await request.save();
     res.json(request);
   } catch (err) {
