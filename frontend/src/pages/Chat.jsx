@@ -10,12 +10,6 @@ const socket = io('https://skillswap-backend-379k.onrender.com', {
   secure: true,
 });
 
-const generateMeetLink = () => {
-  const chars = 'abcdefghijklmnopqrstuvwxyz';
-  const rand = (n) => Array.from({ length: n }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
-  return `https://meet.google.com/${rand(3)}-${rand(4)}-${rand(3)}`;
-};
-
 const Chat = () => {
   const { swapId } = useParams();
   const { user } = useAuth();
@@ -99,18 +93,17 @@ const Chat = () => {
 
   const confirmSession = async () => {
     try {
-      const meetLink = generateMeetLink();
-      const { data } = await API.put(`/swap/${swapId}/confirm-session`, { meetLink });
+      const { data } = await API.put(`/swap/${swapId}/confirm-session`, {});
       setSwap(data);
-      socket.emit('send_message', {
-        swapId,
-        senderId: user._id,
-        text: `📅 Session confirmed! Join here: ${meetLink}`,
-      });
-      toast.success('Session confirmed! Meet link shared 🎥');
+      toast.success('Session confirmed! Now create your Meet link 🎥');
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to confirm session');
     }
+  };
+
+  const openNewMeet = () => {
+    window.open('https://meet.new', '_blank');
+    toast('A new Google Meet room opened — copy the link and paste it in chat for your partner! 📋', { icon: '🎥' });
   };
 
   const isProposer = swap?.session?.proposedBy === user._id || swap?.session?.proposedBy?._id === user._id;
@@ -151,15 +144,15 @@ const Chat = () => {
             {!swap.session.confirmed && !isProposer && (
               <button onClick={confirmSession}
                 className="bg-green-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-green-600 transition">
-                Confirm & Get Meet Link
+                Confirm Session
               </button>
             )}
           </div>
-          {swap.session.confirmed && swap.session.meetLink && (
-            <a href={swap.session.meetLink} target="_blank" rel="noopener noreferrer"
+          {swap.session.confirmed && (
+            <button onClick={openNewMeet}
               className="mt-2 inline-flex items-center gap-2 bg-white border border-green-300 text-green-700 px-3 py-2 rounded-lg text-xs font-semibold hover:bg-green-100 transition">
-              🎥 Join Google Meet
-            </a>
+              🎥 Create Google Meet Room
+            </button>
           )}
         </div>
       )}
