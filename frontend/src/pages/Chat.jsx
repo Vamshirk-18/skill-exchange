@@ -20,7 +20,9 @@ const Chat = () => {
   const [swap, setSwap] = useState(null);
   const [showSchedule, setShowSchedule] = useState(false);
   const [sessionDate, setSessionDate] = useState('');
+  const [uploading, setUploading] = useState(false);
   const bottomRef = useRef(null);
+  const fileInputRef = useRef(null);
 
   const loadSwap = () => {
     API.get('/swap/received').then(({ data }) => {
@@ -105,6 +107,44 @@ const Chat = () => {
     window.open('https://meet.new', '_blank');
     toast('A new Google Meet room opened — copy the link and paste it in chat for your partner! 📋', { icon: '🎥' });
   };
+
+  const handleFileSelect = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (file.size > 15 * 1024 * 1024) {
+      toast.error('File too large! Max 15MB');
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const { data } = await API.post('/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+
+      socket.emit('send_message', {
+        swapId,
+        senderId: user._id,
+        text: '',
+        fileUrl: data.fileUrl,
+        fileName: data.fileName,
+        fileType: data.fileType,
+      });
+
+      toast.success('Material shared! 📎');
+    } catch (err) {
+      toast.error('Upload failed. Try again!');
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  const isImage = (type) => type?.startsWith('image/');
 
   const isProposer = swap?.session?.proposedBy === user._id || swap?.session?.proposedBy?._id === user._id;
 
@@ -191,7 +231,25 @@ const Chat = () => {
                   : 'bg-white text-gray-800 rounded-bl-sm shadow-sm border border-gray-100'
               }`}>
                 {!isMe && <p className="text-xs font-semibold text-indigo-600 mb-1">{msg.sender.name}</p>}
-                <p className="text-sm whitespace-pre-wrap break-words">{msg.text}</p>
+
+                {msg.fileUrl && isImage(msg.fileType) && (
+                  <a href={msg.fileUrl} target="_blank" rel="noopener noreferrer">
+                    <img src={msg.fileUrl} alt={msg.fileName} className="rounded-lg max-w-full max-h-60 mb-1" />
+                  </a>
+                )}
+
+                {msg.fileUrl && !isImage(msg.fileType) && (
+                  <a href={msg.fileUrl} target="_blank" rel="noopener noreferrer"
+                    className={`flex items-center gap-2 px-3 py-2 rounded-lg mb-1 ${
+                      isMe ? 'bg-indigo-500' : 'bg-gray-100'
+                    }`}>
+                    <span className="text-xl">📎</span>
+                    <span className="text-xs underline truncate">{msg.fileName}</span>
+                  </a>
+                )}
+
+                {msg.text && <p className="text-sm whitespace-pre-wrap break-words">{msg.text}</p>}
+
                 <p className={`text-xs mt-1 ${isMe ? 'text-indigo-200' : 'text-gray-400'}`}>
                   {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </p>
@@ -203,7 +261,17 @@ const Chat = () => {
       </div>
 
       {/* Input */}
-      <div className="bg-white border-t border-gray-100 p-3 flex gap-2">
+      <div className="bg-white border-t border-gray-100 p-3 flex gap-2 items-center">
+        <input
+          type="file"
+          ref={fileInputRef}
+          className="hidden"
+          onChange={handleFileSelect}
+        />
+        <button onClick={() => fileInputRef.current?.click()} disabled={uploading}
+          className="text-gray-400 hover:text-indigo-600 transition text-xl p-2 disabled:opacity-50">
+          {uploading ? '⏳' : '📎'}
+        </button>
         <input
           className="flex-1 border border-gray-200 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400 text-sm"
           placeholder="Type a message..."
