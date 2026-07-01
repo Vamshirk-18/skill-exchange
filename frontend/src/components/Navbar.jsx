@@ -75,10 +75,7 @@ const Navbar = () => {
                 className="text-indigo-100 hover:text-white py-3 px-3 rounded-lg hover:bg-indigo-500 transition">
                 📊 Dashboard
               </Link>
-              <Link to="/sessions" onClick={() => setMenuOpen(false)}
-  className="text-indigo-100 hover:text-white py-3 px-3 rounded-lg hover:bg-indigo-500 transition">
-  📅 Sessions
-</Link>
+            
               <Link to="/profile" onClick={() => setMenuOpen(false)}
                 className="text-indigo-100 hover:text-white py-3 px-3 rounded-lg hover:bg-indigo-500 transition">
                 👤 Profile
