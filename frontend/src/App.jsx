@@ -6,9 +6,8 @@ import Browse from './pages/Browse';
 import Profile from './pages/Profile';
 import Dashboard from './pages/Dashboard';
 import Landing from './pages/Landing';
-import { useAuth } from './context/AuthContext';
 import Chat from './pages/Chat';
-import Sessions from './pages/Sessions';
+import { useAuth } from './context/AuthContext';
 
 const PrivateRoute = ({ children }) => {
   const { token } = useAuth();
@@ -26,7 +25,6 @@ function App() {
         <Route path="/profile" element={<PrivateLayout><Profile /></PrivateLayout>} />
         <Route path="/dashboard" element={<PrivateLayout><Dashboard /></PrivateLayout>} />
         <Route path="/chat/:swapId" element={<PrivateLayout><Chat /></PrivateLayout>} />
-        <Route path="/sessions" element={<PrivateLayout><Sessions /></PrivateLayout>} />
       </Routes>
     </BrowserRouter>
   );
