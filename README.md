@@ -3,7 +3,7 @@
 A full-stack MERN application where students can list skills they can teach, find peers, request skill swaps, chat in real time, schedule sessions, and share study materials.
 
 ## 🌐 Live Demo
-[skill-exchange-jet-zeta.vercel.app](https://skill-exchange-jet-zeta.vercel.app)
+[skill-exchange-jet-zeta.vercel.app](https://skill-exchange-jet-zeta.vercel.app) 
 
 ## ✨ Features
 - 🔐 JWT Authentication (Register/Login)
